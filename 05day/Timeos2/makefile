@@ -9,7 +9,8 @@ OBJ2BIM =$(TOOLPATH)obj2bim.exe
 BIM2HRB=$(TOOLPATH)bim2hrb.exe
 IMGTOL=$(TOOLPATH)imgtol.com
 RULEFILE=$(TOOLPATH)haribote/haribote.rul
-
+MAKEFONT=$(TOOLPATH)makefont.exe
+BIN2OBJ=$(TOOLPATH)bin2obj.exe
 default :
 	$(MAKE) img
 ipl.bin : ipl.nas makefile
@@ -22,11 +23,15 @@ bootpack.nas : bootpack.gas makefile
 	$(GAS2NASK) bootpack.gas bootpack.nas
 bootpack.obj : bootpack.nas makefile
 	$(NASK) bootpack.nas bootpack.obj bootpack.lst
+font.bin: font.txt makefile
+	$(MAKEFONT) font.txt font.bin
+font.obj: font.bin makefile
+	$(BIN2OBJ) font.bin font.obj _font
 naskfunc.obj : naskfunc.nas makefile
 	$(NASK) naskfunc.nas naskfunc.obj naskfunc.lst
-bootpack.bim : bootpack.obj naskfunc.obj makefile
+bootpack.bim : bootpack.obj naskfunc.obj font.obj makefile
 	$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map \
-		bootpack.obj naskfunc.obj
+		bootpack.obj naskfunc.obj font.obj
 bootpack.hrb :bootpack.bim makefile
 	$(BIM2HRB) bootpack.bim bootpack.hrb 0
 Timeos.sys : asmhead.bin bootpack.hrb makefile
