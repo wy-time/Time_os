@@ -1,67 +1,5 @@
-#include <stdio.h>
-#define wfor(i,j,k) for(i=j;i<k;++i)
-#define mfor(i,j,k) for(i=j;i>=k;--i)
-#define COL8_000000		0
-#define COL8_FF0000		1
-#define COL8_00FF00		2
-#define COL8_FFFF00		3
-#define COL8_0000FF		4
-#define COL8_FF00FF		5
-#define COL8_00FFFF		6
-#define COL8_FFFFFF		7
-#define COL8_C6C6C6		8
-#define COL8_840000		9
-#define COL8_008400		10
-#define COL8_848400		11
-#define COL8_000084		12
-#define COL8_840084		13
-#define COL8_008484		14
-#define COL8_848484		15
-void io_hlt(void);
-void io_in8(int port);
-void io_out8(int port, int data);
-void io_cli(void);
-void io_sti(void);
-int io_load_eflags(void);
-void io_store_eflags(int eflags);
-void boxfill8(unsigned char*vram, int xsize, unsigned char c, int x0, int y0, int x1, int y1);
-void set_palette(int start, int end, unsigned char *rgb);
-void init_palette();
-void init_screen(unsigned char *vram, int x, int y);
-void putfont8(unsigned char*vram, int xsize, int x, int y, char c, unsigned char *font);
-void putfonts8_asc(unsigned char*vram, int xsize, int x, int y, char c, unsigned char *str);
-void init_mouse_cursor(char *mouse, char bc);
-void putblock8_8(unsigned char* vram, int vxsize, int pxsize, int pysize, int px0, int py0, char*buf, int bxsize);
-struct BOOTINFO//启动区信息
-{
-	char cyls, leds, vmode, reserve;
-	short scrnx, scrny;
-	unsigned char *vram;
-};
-void HariMain(void)//主函数
-{
-	unsigned char *vram;
-	int xsize, ysize;
-	struct BOOTINFO *bootinfo;
-	bootinfo = (struct BOOTINFO *)0x0ff0;
-	xsize = bootinfo->scrnx;
-	ysize = bootinfo->scrny;
-	vram = bootinfo->vram;
-	init_palette();//初始化调色板
-	init_screen(vram, xsize, ysize);
-	putfonts8_asc(vram, xsize, 10, 26, COL8_FFFFFF, (unsigned char*)"XYQ TXDY");
-	putfonts8_asc(vram, xsize, 10, 42, COL8_FFFFFF, (unsigned char*)"LFX TXDY");
-	char s[100];
-	sprintf(s, "vram=%d", (int)vram);
-	putfonts8_asc(vram, xsize, 10, 58, COL8_FFFFFF, (unsigned char*)s);
-	char mouse[16 * 16];
-	init_mouse_cursor(mouse, COL8_008484);
-	int mid_x = (xsize - 16) / 2;
-	int mid_y = (ysize - 28 - 16) / 2;
-	putblock8_8(vram, xsize, 16, 16, mid_x, mid_y, mouse, 16);
-	while (1)
-		io_hlt();
-}
+#include "bootpack.h" 
+/*关于图形处理的函数*/
 void set_palette(int start, int end, unsigned char *rgb)//设置颜色
 {
 	int i, eflags;
@@ -208,3 +146,4 @@ void putblock8_8(unsigned char* vram, int vxsize, int pxsize, int pysize, int px
 		}
 	}
 }
+

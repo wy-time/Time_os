@@ -1,5 +1,8 @@
+OBJS_BOOTPACK = bootpack.obj naskfunc.obj font.obj graphic.obj dsctbl.obj 
+
 TOOLPATH=../../tolset_h/z_tools/
 INCPATH=../../tolset_h/z_tools/haribote/
+
 MAKE= $(TOOLPATH)make.exe -r
 NASK= $(TOOLPATH)nask.exe
 EDIMG=$(TOOLPATH)edimg.exe
@@ -11,27 +14,27 @@ IMGTOL=$(TOOLPATH)imgtol.com
 RULEFILE=$(TOOLPATH)haribote/haribote.rul
 MAKEFONT=$(TOOLPATH)makefont.exe
 BIN2OBJ=$(TOOLPATH)bin2obj.exe
+
 default :
 	$(MAKE) img
 ipl.bin : ipl.nas makefile
 	$(NASK) ipl.nas ipl.bin ipl.lst
 asmhead.bin : asmhead.nas makefile
 	$(NASK) asmhead.nas asmhead.bin asmhead.lst
-bootpack.gas : bootpack.c makefile
-	$(CC1) -o bootpack.gas bootpack.c
-bootpack.nas : bootpack.gas makefile
-	$(GAS2NASK) bootpack.gas bootpack.nas
-bootpack.obj : bootpack.nas makefile
-	$(NASK) bootpack.nas bootpack.obj bootpack.lst
 font.bin: font.txt makefile
 	$(MAKEFONT) font.txt font.bin
 font.obj: font.bin makefile
 	$(BIN2OBJ) font.bin font.obj _font
-naskfunc.obj : naskfunc.nas makefile
-	$(NASK) naskfunc.nas naskfunc.obj naskfunc.lst
-bootpack.bim : bootpack.obj naskfunc.obj font.obj makefile
+%.gas : %.c makefile
+	$(CC1) -o $*.gas $*.c
+%.nas: %.gas makefile
+	$(GAS2NASK) $*.gas $*.nas
+%.obj: %.nas makefile
+	$(NASK) $*.nas $*.obj $*.lst
+
+bootpack.bim : $(OBJS_BOOTPACK) makefile
 	$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map \
-		bootpack.obj naskfunc.obj font.obj
+		$(OBJS_BOOTPACK)
 bootpack.hrb :bootpack.bim makefile
 	$(BIM2HRB) bootpack.bim bootpack.hrb 0
 Timeos.sys : asmhead.bin bootpack.hrb makefile
@@ -50,9 +53,7 @@ run :
 clean :
 	-rm *.bin
 	-rm *.lst
-	-rm *.gas
 	-rm *.obj
-	-rm bootpack.nas
 	-rm bootpack.map
 	-rm bootpack.bim
 	-rm bootpack.hrb
