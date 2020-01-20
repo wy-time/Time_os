@@ -14,10 +14,11 @@ struct BOOTINFO//启动区信息 0x0ff0-0x0fff
 
 /*naskfunc.nas*/
 void io_hlt(void);
-void io_in8(int port);
+int io_in8(int port);
 void io_out8(int port, int data);
 void io_cli(void);
 void io_sti(void);
+void io_stihlt(void);
 int io_load_eflags(void);
 void io_store_eflags(int eflags);
 void load_gdtr(int limit,int addr);
@@ -94,3 +95,17 @@ void inthandler2c(int *esp);
 #define PIC1_ICW2		0x00a1
 #define PIC1_ICW3		0x00a1
 #define PIC1_ICW4		0x00a1
+/*fifo.c*/
+struct FIFO8 
+{
+    unsigned char *buf;//缓冲区首地址
+    int next_w;//下一个写入地址
+    int next_r;//下一个读出地址
+    int size;//缓冲区大小
+    int free;//缓冲区剩余空闲大小
+    int flag;//是否溢出标志
+};
+void fifo8_init(struct FIFO8* fifo,int size,unsigned char*buf);
+int fifo8_put(struct FIFO8*fifo,unsigned char data);
+int fifo8_get(struct FIFO8 *fifo);
+int fifo_status(struct FIFO8 *fifo);

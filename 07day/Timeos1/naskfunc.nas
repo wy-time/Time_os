@@ -12,6 +12,8 @@
     GLOBAL  _io_out8,   _io_out16,  _io_out32
     GLOBAL  _io_load_eflags,    _io_store_eflags
     GLOBAL  _load_gdtr, _load_idtr
+    GLOBAL  _asm_inthandler21,_asm_inthandler27,_asm_inthandler2c     ;中断处理保护现场与返回
+    EXTERN  _inthandler21,_inthandler27,_inthandler2c
 ;以下是实际函数
 [SECTION .text] ;目标文件中写了这些之后再写程序
 _io_hlt:     ;void io_hlt(void);
@@ -27,17 +29,17 @@ _io_stihlt: ;void io_stihlt (void);
     STI
     HLT
     RET
-_io_in8:    ;void io_in8(port);
+_io_in8:    ;int io_in8(port);
     MOV EDX,[ESP+4]
     MOV EAX,0
     IN  AL,DX
     RET
-_io_in16:   ;void io_in16(port);
+_io_in16:   ;int io_in16(port);
     MOV EDX,[ESP+4]
     MOV EAX,0
     IN  AX,DX
     RET
-_io_in32:   ;void io_in32(port);
+_io_in32:   ;int io_in32(port);
     MOV EDX,[ESP+4]
     IN EAX,DX
     RET
@@ -75,7 +77,53 @@ _load_idtr:     ;void load_idtr(int limit,int addr);
     MOV     [ESP+6],AX
     LIDT    [ESP+6]
     RET
-; C语言可以用指针实现，所有注释了
+_asm_inthandler21: 
+    PUSH    ES
+    PUSH    DS
+    PUSHAD
+    MOV     EAX,ESP
+    PUSH    EAX
+    MOV     AX,SS
+    MOV     DS,AX
+    MOV     ES,AX
+    CALL    _inthandler21
+    POP     EAX
+    POPAD
+    POP     DS
+    POP     ES
+    IRETD
+
+_asm_inthandler27:
+    PUSH    ES
+    PUSH    DS
+    PUSHAD
+    MOV     EAX,ESP
+    PUSH    EAX
+    MOV     AX,SS
+    MOV     DS,AX
+    MOV     ES,AX
+    CALL    _inthandler27
+    POP     EAX
+    POPAD
+    POP     DS
+    POP     ES
+    IRETD
+_asm_inthandler2c:
+    PUSH    ES
+    PUSH    DS
+    PUSHAD
+    MOV     EAX,ESP
+    PUSH    EAX
+    MOV     AX,SS
+    MOV     DS,AX
+    MOV     ES,AX
+    CALL    _inthandler2c
+    POP     EAX
+    POPAD
+    POP     DS
+    POP     ES
+    IRETD
+; C语言可以用指针实现，所以注释了
 ;_write_mem8:    ; void write_mem8(int addr,int data);
 ;    MOV ECX,[ESP+4]     ;[ESP+4]中存放的是第一份参数也就是地址，将其读入ECX
 ;    MOV AL,[ESP+8]      ;[ESP+8]中存放的是第二个参数也就是数据，将其读入AL

@@ -1,4 +1,5 @@
-OBJS_BOOTPACK = bootpack.obj naskfunc.obj font.obj graphic.obj dsctbl.obj 
+OBJS_BOOTPACK = bootpack.obj naskfunc.obj font.obj graphic.obj dsctbl.obj \
+				int.obj fifo.obj
 
 TOOLPATH=../../tolset_h/z_tools/
 INCPATH=../../tolset_h/z_tools/haribote/
@@ -46,7 +47,7 @@ Timeos.img : ipl.bin Timeos.sys makefile
 	  	imgout:Timeos.img
 img :
 	$(MAKE) Timeos.img
-run :
+run : 
 	$(MAKE) Timeos.img
 	cp Timeos.img ../../tolset_h/z_tools/qemu/fdimage0.bin
 	$(MAKE)	-C ../../tolset_h/z_tools/qemu

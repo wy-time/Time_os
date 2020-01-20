@@ -1,7 +1,8 @@
 /* int.c*/
 
 #include "bootpack.h"
-
+#include <stdio.h> 
+#define PORT_KEYDAT 0x0060
 void init_pic(void)
 /* PIC初始化*/
 {
@@ -27,10 +28,14 @@ void inthandler21 (int *emp) //0x21号中断函数，键盘的中断 IRQ1
 {
     struct BOOTINFO *bootinfo;
 	bootinfo = (struct BOOTINFO *)ADR_BOOTINFO;
-    boxfill8(bootinfo->vram,bootinfo->scrnx,COL8_000000,0,0,32*8-1,15);
-    putfonts8_asc(bootinfo->vram,bootinfo->scrnx,0,0,COL8_FFFFFF,(unsigned char*)"*INT 21 keyboard");
-    for (;;)
-        io_hlt();
+    unsigned char data, s[4];
+    io_out8(PIC0_OCW2,0x61);//通知PIC IRQ-1已经处理完成
+    data=io_in8(PORT_KEYDAT);
+    sprintf(s,"%02X",data);
+    boxfill8(bootinfo->vram,bootinfo->scrnx,COL8_008484,0,16,15,31);
+    putfonts8_asc(bootinfo->vram,bootinfo->scrnx,0,16,COL8_FFFFFF,s);
+   // for (;;)
+   //     io_hlt();
 }
 void inthandler2c (int *emp) //0x2c号中断函数，鼠标的中断 IRQ12
 {

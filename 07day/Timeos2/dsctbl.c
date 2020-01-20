@@ -19,6 +19,9 @@ void init_gdtidt(void)//初始化GDT，IDT
         set_gatedesc(idt+i,0,0,0);
     }
     load_idtr(LIMIT_IDT,ADR_IDT);//给中断记录表寄存器赋值(汇编)
+    set_gatedesc(idt+0x21,(int)asm_inthandler21,2<<3,AR_INTGATE32);//注册中断函数
+    set_gatedesc(idt+0x27,(int)asm_inthandler27,2<<3,AR_INTGATE32);
+    set_gatedesc(idt+0x2c,(int)asm_inthandler2c,2<<3,AR_INTGATE32);
 }
 void set_segmdesc(struct SEGMENT_DESCRIPTOR *sd,unsigned int limit,int base,int ar)//设置GDT
 {

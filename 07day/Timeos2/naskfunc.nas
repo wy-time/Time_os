@@ -29,17 +29,17 @@ _io_stihlt: ;void io_stihlt (void);
     STI
     HLT
     RET
-_io_in8:    ;void io_in8(port);
+_io_in8:    ;int io_in8(port);
     MOV EDX,[ESP+4]
     MOV EAX,0
     IN  AL,DX
     RET
-_io_in16:   ;void io_in16(port);
+_io_in16:   ;int io_in16(port);
     MOV EDX,[ESP+4]
     MOV EAX,0
     IN  AX,DX
     RET
-_io_in32:   ;void io_in32(port);
+_io_in32:   ;int io_in32(port);
     MOV EDX,[ESP+4]
     IN EAX,DX
     RET
